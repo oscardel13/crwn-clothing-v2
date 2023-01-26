@@ -1,11 +1,14 @@
 import { getRedirectResult } from "firebase/auth";
 import { useState, useEffect } from "react";
+import { useDispatch } from "react-redux";
 
-import { auth,signInWithGooglePopup,signInAuthUserWtihEmailPassword,createUserDocumentFromAuth } from "../../utils/firebase/firebase.utils";
+import { auth,signInAuthUserWtihEmailPassword,createUserDocumentFromAuth } from "../../utils/firebase/firebase.utils";
 import FormInput from "../form-input/form-input.component";
 import Button, {BUTTON_TYPE_CLASSES} from "../button/button.component";
 
 import {SignInContainer,ButtonContainer} from './sign-in-form.styles.jsx'
+import { emailSignInStart, googleSignInStart } from "../../store/user/user.action";
+
 
 const defaultFormFields = {
     email: '',
@@ -13,6 +16,7 @@ const defaultFormFields = {
 }
 
 const SignInForm = () => {
+    const dispatch = useDispatch();
     const [formFields, setFormFields] = useState(defaultFormFields);
     const { email, password } = formFields;
 
@@ -28,8 +32,8 @@ const SignInForm = () => {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-        try {
-            await signInAuthUserWtihEmailPassword(email,password);           
+        try {        
+            dispatch(emailSignInStart(email,password))
             clearFormFields();
         } catch (error) {
             if (error.code = 'auth/wrong-password'){
@@ -47,8 +51,8 @@ const SignInForm = () => {
         }
     },[]);
 
-    const signInWithGoogle = async () => {
-        await signInWithGooglePopup();   
+    const signInWithGoogle = () => {
+        dispatch(googleSignInStart())
       };
 
     return(
