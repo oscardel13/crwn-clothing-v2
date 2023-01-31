@@ -4,7 +4,6 @@ const stripe = require("stripe")(process.env.REACT_APP_STRIPE_SECRET_KEY)
 
 exports.handler = async (event) => {
     try {
-        console.log("CREATE_PAYMENT_INTENT IN THE SERVERLESS FUNCTION")
         const { amount } = JSON.parse(event.body);
         const paymentIntent = await stripe.paymentIntents.create({
             amount,
