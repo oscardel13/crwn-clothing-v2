@@ -10,7 +10,7 @@ import CartIcon from "../../components/cart-icon/cart-icon.component";
 import CartDropdown from "../../components/cart-dropdown/cart-dropdown.component";
 
 import { NavigationContainer, NavLink, NavLinksCotainer, LogoContainer } from './navigation.styles';
-import { signOutStart } from "../../store/user/user.action";
+import { signOutStart } from "../../store/user/user.reducer";
 
 const Navigation = () => {
   const dispatch = useDispatch()

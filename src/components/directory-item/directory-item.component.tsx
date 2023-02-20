@@ -1,5 +1,5 @@
 import { useNavigate } from 'react-router-dom'
-import { CategoryItem, Category } from '../../store/category/category.types'
+import { CategoryItem, Category } from '../../store/category/category.reducer'
 import { CategoryProps } from '../directory/directory.component'
 
 import {Body,BackgroundImage,DirectoryItemContainer} from './directory-item.styles'

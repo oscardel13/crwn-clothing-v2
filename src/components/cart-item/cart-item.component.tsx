@@ -1,4 +1,4 @@
-import { CartItem as CartItemProp} from '../../store/cart/cart.types';
+import { CartItem as CartItemProp} from '../../store/cart/cart.reducer';
 import {CartItemContainer, ItemDetails} from './cart-item.styles';
 
 const CartItem = ({ item } : { item: CartItemProp }) => {

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Category, CategoryItem, CategoryMap } from '../../store/category/category.types';
+import { Category, CategoryItem, CategoryMap } from '../../store/category/category.reducer';
 
 import ProductCard from '../product-card/product-card.component';
 

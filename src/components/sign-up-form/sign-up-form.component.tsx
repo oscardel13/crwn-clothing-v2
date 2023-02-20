@@ -6,7 +6,7 @@ import FormInput from "../form-input/form-input.component";
 import Button from "../button/button.component";
 
 import {SignUpContainer} from './sign-up-form.styles'
-import { signUpStart } from "../../store/user/user.action";
+import { signUpStart } from "../../store/user/user.reducer";
 
 const defaultFormFields = {
     displayName: '',
@@ -38,7 +38,7 @@ const SignUpForm = () => {
             return;
         }
         try {
-            dispatch(signUpStart(email,password,displayName))
+            dispatch(signUpStart({email,password,displayName}))
             clearFormFields();
 
         } catch (error) {

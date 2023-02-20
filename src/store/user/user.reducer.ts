@@ -1,8 +1,8 @@
-import { AnyAction } from 'redux';
+import { createSlice } from '@reduxjs/toolkit';
+import { UserData } from "../../utils/firebase/firebase.utils"
+import { User } from "firebase/auth"
 
-import { USER_ACTION_TYPES } from "./user.types";
-
-import { UserWithID, checkUserSession ,googleSignInStart, emailSignInStart, signInFailed, signInSuccess, signOutFailed, signOutStart, signOutSuccess, signUpFailed, signUpStart, signUpSuccess } from "./user.action";
+export type UserWithID = UserData & {id: string}
 
 export type UserState = {
     readonly currentUser?: UserWithID | null;
@@ -16,17 +16,38 @@ const INITIAL_STATE: UserState = {
     error: null
 }
 
-// useeReducer way of handling useState
-export const userReducer = (state = INITIAL_STATE, action: AnyAction): UserState => {
-    if (signInSuccess.match(action)){
-        return {...state, currentUser:action.payload, isLoading:false}
+export const userSlice = createSlice({
+    name: "user",
+    initialState: INITIAL_STATE,
+    reducers : {
+        checkUserSession(){},
+        googleSignInStart(state) {
+            state.isLoading = true
+        },
+        emailSignInStart(state, action) {
+            state.isLoading = true
+        },
+        signUpStart(state,action) {
+            state.isLoading = true
+        },
+        signOutStart(state) {
+            state.isLoading = true
+        },
+        signInSuccess(state,action){
+            state.currentUser = action.payload
+            state.isLoading = false
+        },
+        signOutSuccess(state){
+            state.currentUser = null
+            state.isLoading = false
+        },
+        signInFailed(state,action){
+            state.error = action.payload
+            state.isLoading = false
+        }
     }
-    if (signOutSuccess.match(action)){
-        return {...state, currentUser:null, isLoading:false}
-    }
-    if (signInFailed.match(action) || signOutFailed.match(action) || signUpFailed.match(action)){
-        return {...state, error:action.payload, isLoading:false}
-    }
-    
-    return state;
-}
+  
+  })
+  
+  export const { checkUserSession, googleSignInStart, emailSignInStart, signUpStart, signOutStart, signInSuccess, signOutSuccess, signInFailed } = userSlice.actions;
+  export const userReducer = userSlice.reducer;

@@ -7,7 +7,7 @@ import FormInput from "../form-input/form-input.component";
 import Button, {BUTTON_TYPE_CLASSES} from "../button/button.component";
 
 import {SignInContainer,ButtonContainer} from './sign-in-form.styles'
-import { emailSignInStart, googleSignInStart } from "../../store/user/user.action";
+import { emailSignInStart, googleSignInStart } from "../../store/user/user.reducer";
 
 
 const defaultFormFields = {
@@ -33,7 +33,7 @@ const SignInForm = () => {
     const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         try {        
-            dispatch(emailSignInStart(email,password))
+            dispatch(emailSignInStart({email,password}))
             clearFormFields();
         } catch (error) {
             console.log(error)

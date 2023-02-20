@@ -26,7 +26,7 @@ import { getFirestore,
     DocumentData,
     QueryDocumentSnapshot
 } from 'firebase/firestore';
-import { Category } from "../../store/category/category.types";
+import { Category } from "../../store/category/category.reducer";
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -86,28 +86,34 @@ export type AdditionalInfromation = {
     displayName?: string;   
 }
 
-export const createUserDocumentFromAuth = async (userAuth: User, additionalInfo={} as AdditionalInfromation): Promise<void | QueryDocumentSnapshot<UserData>>=> {
+export const createUserDocumentFromAuth = async (
+    userAuth: User,
+    additionalInformation = {} as AdditionalInfromation
+  ): Promise<void | QueryDocumentSnapshot<UserData>> => {
     if (!userAuth) return;
-    const userDocRef = doc(db, 'users', userAuth.uid)
-    const userSnapshot = await getDoc(userDocRef)
-
+  
+    const userDocRef = doc(db, 'users', userAuth.uid);
+  
+    const userSnapshot = await getDoc(userDocRef);
+  
     if (!userSnapshot.exists()) {
-        const {displayName, email } = userAuth;
-        const createdAt = new Date();
-        try {
-            await setDoc(userDocRef,{
-                displayName,
-                email,
-                createdAt,
-                ...additionalInfo
-            })
-        }
-        catch (error){
-            console.error();
-        }
+      const { displayName, email } = userAuth;
+      const createdAt = new Date();
+  
+      try {
+        await setDoc(userDocRef, {
+          displayName,
+          email,
+          createdAt,
+          ...additionalInformation,
+        });
+      } catch (error) {
+        console.log('error creating the user', error);
+      }
     }
-    return userSnapshot as QueryDocumentSnapshot<UserData>
-}
+  
+    return userSnapshot as QueryDocumentSnapshot<UserData>;
+  };
 
 export const createAuthUserWithEmailPassword = async (email: string,password: string): Promise<UserCredential|void> => {
     if(!email||!password) return;

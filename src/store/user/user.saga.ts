@@ -10,25 +10,39 @@ import { createAuthUserWithEmailPassword,
         AdditionalInfromation} from "../../utils/firebase/firebase.utils"
 import { ActionWithPayload } from "../../utils/reducer/reducer.util";
 
-import {       
-        signInSuccess,
-        signInFailed,
-        signOutFailed,
-        signOutSuccess,
-        signUpFailed, 
-        signUpSuccess,
-        EmailSignInStart,
-        SignUpStart,
-        SignUpSuccess} from './user.action'
+import {   
+    checkUserSession,    
+    googleSignInStart,
+    emailSignInStart,
+    signUpStart,
+    signOutStart,
+    signInSuccess, 
+    signOutSuccess,
+    signInFailed
+} from './user.reducer'
 
-import {USER_ACTION_TYPES} from "./user.types"
+export type EmailSignInStart = ActionWithPayload<{email:string,password:string}>
 
 export function* getSnapshotFromUserAuth(userAuth: User, additionalDetails?: AdditionalInfromation){
     try{
         const userSnapshot = yield* call(createUserDocumentFromAuth,userAuth, additionalDetails);
         if (userSnapshot){
-            const user = {id:userSnapshot.id, ...userSnapshot.data()}
-            yield* put(signInSuccess(user))
+            if (userSnapshot.data()){
+                const {email, displayName} = userSnapshot.data()
+                const user = {id:userSnapshot.id, email, displayName }
+                yield* put(signInSuccess(user))
+            }
+            else{
+                if (additionalDetails){
+                    const user = {id:userSnapshot.id, email:userAuth.email, displayName: additionalDetails.displayName }
+                    yield* put(signInSuccess(user))
+                }
+                else {
+                    const user = {id:userAuth.uid, email:userAuth.email, displayName: userAuth.displayName }
+                    yield* put(signInSuccess(user))
+                };
+            }
+           
         } 
     }   
     catch(error) {
@@ -52,7 +66,7 @@ export function* isUserAuthenticated(){
 }
 
 export function* onCheckUserSession() {
-    yield* takeLatest(USER_ACTION_TYPES.CHECK_USER_SESSION, isUserAuthenticated)
+    yield* takeLatest(checkUserSession, isUserAuthenticated)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -69,14 +83,14 @@ export function* googleSignInSaga() {
 }
 
 export function* onGoogleSignIn() {
-    yield* takeLatest(USER_ACTION_TYPES.GOOGLE_SIGN_IN_START, googleSignInSaga)
+    yield* takeLatest(googleSignInStart, googleSignInSaga)
 }
 
 //////////////////////////////////////////////////////////////////////
 // Email and Password Sign In
 
 export function* signInWithEmail(action : EmailSignInStart){
-    const {type, payload} = action
+    const { payload } = action
     try{
         const { user } = yield call(signInAuthUserWtihEmailPassword,
             payload.email,payload.password)
@@ -88,7 +102,7 @@ export function* signInWithEmail(action : EmailSignInStart){
 }
 
 export function* onEmailSignIn() {
-    yield* takeLatest(USER_ACTION_TYPES.EMAIL_SIGN_IN_START,signInWithEmail)
+    yield* takeLatest(emailSignInStart,signInWithEmail)
 }
 
 //////////////////////////////////////////////////////////////////////
@@ -99,41 +113,49 @@ export function* signOutAuth() {
         yield* put(signOutSuccess())
     }
     catch(error){
-        yield* put(signOutFailed(error as Error))
+        yield* put(signInFailed(error as Error))
     }
 }
 
 export function* onSignOut() {
-    yield* takeLatest(USER_ACTION_TYPES.SIGN_OUT_START,signOutAuth)
+    yield* takeLatest(signOutStart,signOutAuth)
 }
 ///////////////////////////////////////////////////////////////////////
 // Sign Up User
 
-export function* signUpUser({type, payload}: SignUpStart) {
+export type SignUpStartProps = {
+    email: string;
+    password: string;
+    displayName: string;
+  }
+
+export type SignUpStart = ActionWithPayload<SignUpStartProps>
+
+export function* signUpUser({payload}: SignUpStart) {
     try{
         const userCred = yield* call(createAuthUserWithEmailPassword,
         payload.email,payload.password)
         if (userCred){
             const user = userCred.user
-            yield* put(signUpSuccess(user, {displayName: payload.displayName}))
+            yield* call(getSnapshotFromUserAuth,user, {displayName: payload.displayName})
         }
     }
     catch(error){
-        yield* put(signUpFailed(error as Error))
+        yield* put(signInFailed(error as Error))
     }
 } 
 
 export function* onSignUp() {
-    yield* takeLatest(USER_ACTION_TYPES.SIGN_UP_START, signUpUser)
+    yield* takeLatest(signUpStart, signUpUser)
 }
 
-export function* signUpSuccessSaga({payload: { user, additionalDetails }}: SignUpSuccess){
-    yield* call(getSnapshotFromUserAuth,user, additionalDetails)
+export type SignUpStartPaylaod = {
+    user: User,
+    additionalDetails?: AdditionalInfromation
 }
 
-export function* onSignUpSuccess(){
-    yield* takeLatest(USER_ACTION_TYPES.SIGN_UP_SUCCESS, signUpSuccessSaga)
-}
+export type SignUpSuccess = ActionWithPayload<SignUpStartPaylaod>
+
 
 ///////////////////////////////////////////////////////////////////////
 
