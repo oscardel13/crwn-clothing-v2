@@ -1,11 +1,15 @@
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-export const BackgroundImage = styled.div`
+
+type BackgroundImageProps = {
+  imageUrl: string;
+};
+
+export const BackgroundImage = styled.div<BackgroundImageProps>`
   width: 100%;
   height: 100%;
   background-size: cover;
   background-position: center;
-  background-image: ${({ imageUrl }: {imageUrl:string}) => `url(${imageUrl})`};
+  background-image: ${({ imageUrl }) => `url(${imageUrl})`};
 `;
 
 export const Body = styled.div`
@@ -29,6 +33,11 @@ export const Body = styled.div`
   p {
     font-weight: lighter;
     font-size: 16px;
+  }
+
+  @media screen and (max-width: 800px){
+    height: 100px;
+    width: 130px;
   }
 `;
 
@@ -57,5 +66,9 @@ export const DirectoryItemContainer = styled.div`
     ${Body} {
       opacity: 0.9;
     }
+  }
+
+  @media screen and (max-width: 800px){ 
+    height: 200px 
   }
 `;
