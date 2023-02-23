@@ -22,8 +22,10 @@ export const addCartItem = (cartItems:CartItem[], productToAdd:CategoryItem): Ca
 }; 
 
 export const clearCartItem = (cartItems:CartItem[],itemToRemove:CartItem): CartItem[] => {
-    if (cartItems && cartItems.length> 0)
-    return cartItems.filter( item => item!==itemToRemove)
+    if (cartItems && cartItems.length> 0){
+    console.log("here")
+    return cartItems.filter( item => item.id!==itemToRemove.id)
+    }
     return cartItems
 };
 
